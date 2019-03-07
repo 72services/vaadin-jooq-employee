@@ -11,12 +11,15 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.annotation.UIScope;
 
 import java.util.stream.Collectors;
 
+@UIScope
+@SpringComponent
 public class EmployeeForm extends FormLayout {
 
-    private final EmployeeView employeeView;
     private final EmployeeService employeeService;
     private final DepartmentService departmentService;
 
@@ -30,8 +33,9 @@ public class EmployeeForm extends FormLayout {
 
     private EmployeeRecord employee;
 
-    public EmployeeForm(EmployeeView employeeView, EmployeeService employeeService, DepartmentService departmentService) {
-        this.employeeView = employeeView;
+    private ChangeHandler changeHandler;
+
+    public EmployeeForm(EmployeeService employeeService, DepartmentService departmentService) {
         this.employeeService = employeeService;
         this.departmentService = departmentService;
 
@@ -64,27 +68,29 @@ public class EmployeeForm extends FormLayout {
         this.employee = employee;
         binder.setBean(employee);
 
-        boolean enabled = employee != null;
-        setVisible(enabled);
-        if (enabled) {
-            name.focus();
-        }
+        name.focus();
 
         save.addClickListener(e -> this.save());
         delete.addClickListener(e -> this.delete());
     }
 
+    public void setChangeHandler(ChangeHandler changeHandler) {
+        this.changeHandler = changeHandler;
+    }
+
     private void delete() {
         employeeService.delete(employee);
 
-        employeeView.updateList();
-        setEmployee(null);
+        changeHandler.onChange();
     }
 
     private void save() {
         employeeService.save(employee);
 
-        employeeView.updateList();
-        setEmployee(null);
+        changeHandler.onChange();
+    }
+
+    public interface ChangeHandler {
+        void onChange();
     }
 }

@@ -1,7 +1,6 @@
 package com.example.employee.view;
 
 import com.example.employee.model.tables.records.EmployeeRecord;
-import com.example.employee.service.DepartmentService;
 import com.example.employee.service.EmployeeService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -11,12 +10,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.annotation.UIScope;
-import org.springframework.stereotype.Component;
 
-@Route("")
-@UIScope
-@Component
+@Route
 public class EmployeeView extends VerticalLayout {
 
     private final EmployeeService employeeService;
@@ -25,10 +20,10 @@ public class EmployeeView extends VerticalLayout {
     private Grid<EmployeeRecord> grid = new Grid<>(EmployeeRecord.class);
     private TextField filterText = new TextField();
 
-    public EmployeeView(EmployeeService employeeService, DepartmentService departmentService) {
+    public EmployeeView(EmployeeService employeeService, EmployeeForm employeeForm) {
         this.employeeService = employeeService;
 
-        this.employeeForm = new EmployeeForm(this, employeeService, departmentService);
+        this.employeeForm = employeeForm;
 
         createUI();
     }
@@ -47,6 +42,7 @@ public class EmployeeView extends VerticalLayout {
         addEmployeeButton.addClickListener(e -> {
             grid.asSingleSelect().clear();
             employeeForm.setEmployee(new EmployeeRecord());
+            employeeForm.setVisible(true);
         });
 
         HorizontalLayout toolbar = new HorizontalLayout(filtering, addEmployeeButton);
@@ -56,6 +52,13 @@ public class EmployeeView extends VerticalLayout {
 
         grid.asSingleSelect().addValueChangeListener(event -> {
             employeeForm.setEmployee(event.getValue());
+            employeeForm.setVisible(true);
+        });
+
+        // Listen changes made by the form, refresh data from backend
+        employeeForm.setChangeHandler(() -> {
+            employeeForm.setVisible(false);
+            updateList();
         });
 
         HorizontalLayout main = new HorizontalLayout(grid, employeeForm);
