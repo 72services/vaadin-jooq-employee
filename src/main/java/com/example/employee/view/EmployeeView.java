@@ -10,6 +10,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
+import io.seventytwo.vaadinjooq.RecordGrid;
 
 import static com.example.employee.model.tables.VEmployee.V_EMPLOYEE;
 
@@ -19,7 +20,7 @@ public class EmployeeView extends VerticalLayout {
     private final EmployeeService employeeService;
     private final EmployeeForm employeeForm;
 
-    private TableGrid<VEmployeeRecord> grid = new TableGrid<>(VEmployeeRecord.class);
+    private RecordGrid<VEmployeeRecord> grid = new RecordGrid<>(VEmployeeRecord.class);
     private TextField filterText = new TextField();
 
     public EmployeeView(EmployeeService employeeService, EmployeeForm employeeForm) {
