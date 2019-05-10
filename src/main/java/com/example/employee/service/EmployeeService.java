@@ -24,7 +24,7 @@ public class EmployeeService {
     public List<VEmployeeRecord> findAll(String value) {
         return dsl
                 .selectFrom(V_EMPLOYEE)
-                .where(V_EMPLOYEE.EMPLOYEE_NAME.like("%" + value + "%"))
+                .where(V_EMPLOYEE.EMPLOYEE_NAME.lower().like("%" + value.toLowerCase() + "%"))
                 .orderBy(V_EMPLOYEE.EMPLOYEE_NAME)
                 .fetch();
     }
@@ -38,11 +38,7 @@ public class EmployeeService {
     @Transactional
     public void save(EmployeeRecord employeeRecord) {
         dsl.attach(employeeRecord);
-        if (employeeRecord.getId() == null) {
-            employeeRecord.insert();
-        } else {
-            employeeRecord.update();
-        }
+        employeeRecord.store();
     }
 
     public EmployeeRecord findById(Integer id) {
