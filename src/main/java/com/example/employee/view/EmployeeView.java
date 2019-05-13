@@ -53,11 +53,10 @@ public class EmployeeView extends VerticalLayout {
 
         HorizontalLayout toolbar = new HorizontalLayout(filtering, addEmployeeButton);
 
-        RecordGrid.Builder<VEmployeeRecord> recordGridBuilder = new RecordGrid.Builder<>(V_EMPLOYEE, dslContext);
-        recordGridBuilder.withColumns(V_EMPLOYEE.EMPLOYEE_ID, V_EMPLOYEE.EMPLOYEE_NAME, V_EMPLOYEE.DEPARTMENT_NAME);
-        recordGridBuilder.withSort(Map.of(V_EMPLOYEE.EMPLOYEE_NAME, true));
-
-        grid = recordGridBuilder.build();
+        grid = new RecordGrid.Builder<>(V_EMPLOYEE, dslContext)
+                .withColumns(V_EMPLOYEE.EMPLOYEE_ID, V_EMPLOYEE.EMPLOYEE_NAME, V_EMPLOYEE.DEPARTMENT_NAME)
+                .withSort(Map.of(V_EMPLOYEE.EMPLOYEE_NAME, true))
+                .build();
 
         grid.setSizeFull();
 
