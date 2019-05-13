@@ -59,9 +59,9 @@ public class EmployeeView extends VerticalLayout {
 
         grid = recordGridBuilder.build();
 
-        this.grid.setSizeFull();
+        grid.setSizeFull();
 
-        this.grid.asSingleSelect().addValueChangeListener(event -> {
+        grid.asSingleSelect().addValueChangeListener(event -> {
             EmployeeRecord employee = dslContext
                     .selectFrom(EMPLOYEE)
                     .where(EMPLOYEE.ID.eq(event.getValue().getEmployeeId()))
@@ -75,7 +75,7 @@ public class EmployeeView extends VerticalLayout {
             grid.refresh();
         });
 
-        HorizontalLayout main = new HorizontalLayout(this.grid, employeeForm);
+        HorizontalLayout main = new HorizontalLayout(grid, employeeForm);
         main.setSizeFull();
 
         add(toolbar, main);

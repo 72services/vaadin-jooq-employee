@@ -2,6 +2,7 @@ package com.example.employee.view;
 
 import com.example.employee.model.tables.records.DepartmentRecord;
 import com.example.employee.model.tables.records.EmployeeRecord;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -112,15 +113,25 @@ public class EmployeeForm extends FormLayout {
 
         name.focus();
 
-        save.addClickListener(e -> this.save());
-        delete.addClickListener(e -> this.delete());
+        save.addClickListener(this::save);
+        delete.addClickListener(this::delete);
     }
 
     public void setChangeHandler(ChangeHandler changeHandler) {
         this.changeHandler = changeHandler;
     }
 
-    private void delete() {
+    private void save(ClickEvent<Button> event) {
+        transactionTemplate.execute(transactionStatus -> {
+            dslContext.attach(employee);
+            employee.store();
+
+            changeHandler.onChange();
+            return null;
+        });
+    }
+
+    private void delete(ClickEvent<Button> event) {
         transactionTemplate.execute(transactionStatus -> {
             dslContext.attach(employee);
             employee.delete();
@@ -130,15 +141,6 @@ public class EmployeeForm extends FormLayout {
         });
     }
 
-    private void save() {
-        transactionTemplate.execute(transactionStatus -> {
-            dslContext.attach(employee);
-            employee.store();
-
-            changeHandler.onChange();
-            return null;
-        });
-    }
 
     public interface ChangeHandler {
         void onChange();
