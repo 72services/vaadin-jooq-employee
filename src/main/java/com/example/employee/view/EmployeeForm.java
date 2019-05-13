@@ -2,8 +2,6 @@ package com.example.employee.view;
 
 import com.example.employee.model.tables.records.DepartmentRecord;
 import com.example.employee.model.tables.records.EmployeeRecord;
-import com.example.employee.service.DepartmentService;
-import com.example.employee.service.EmployeeService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -17,14 +15,19 @@ import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import org.jooq.DSLContext;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
+
+import static com.example.employee.model.tables.Department.DEPARTMENT;
 
 @UIScope
 @SpringComponent
 public class EmployeeForm extends FormLayout {
 
-    private final EmployeeService employeeService;
+    private final DSLContext dslContext;
+    private final TransactionTemplate transactionTemplate;
 
     private final List<DepartmentRecord> departments;
 
@@ -40,10 +43,11 @@ public class EmployeeForm extends FormLayout {
 
     private ChangeHandler changeHandler;
 
-    public EmployeeForm(EmployeeService employeeService, DepartmentService departmentService) {
-        this.employeeService = employeeService;
+    public EmployeeForm(DSLContext dslContext, TransactionTemplate transactionTemplate) {
+        this.dslContext = dslContext;
 
-        departments = departmentService.findAll();
+        departments = dslContext.selectFrom(DEPARTMENT).orderBy(DEPARTMENT.NAME).fetch();
+        this.transactionTemplate = transactionTemplate;
 
         createUI();
     }
@@ -117,15 +121,23 @@ public class EmployeeForm extends FormLayout {
     }
 
     private void delete() {
-        employeeService.delete(employee);
+        transactionTemplate.execute(transactionStatus -> {
+            dslContext.attach(employee);
+            employee.delete();
 
-        changeHandler.onChange();
+            changeHandler.onChange();
+            return null;
+        });
     }
 
     private void save() {
-        employeeService.save(employee);
+        transactionTemplate.execute(transactionStatus -> {
+            dslContext.attach(employee);
+            employee.store();
 
-        changeHandler.onChange();
+            changeHandler.onChange();
+            return null;
+        });
     }
 
     public interface ChangeHandler {

@@ -1,23 +1,26 @@
 package com.example.employee.data;
 
 import com.example.employee.model.tables.records.DepartmentRecord;
-import com.example.employee.service.DepartmentService;
+import org.jooq.DSLContext;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class DepartmentPopulator {
 
-    private final DepartmentService departmentService;
+    private final DSLContext dslContext;
 
-    public DepartmentPopulator(DepartmentService departmentService) {
-        this.departmentService = departmentService;
+    public DepartmentPopulator(DSLContext dslContext) {
+        this.dslContext = dslContext;
     }
 
+    @Transactional
     @EventListener(ApplicationReadyEvent.class)
     public void insertItDepartment() {
         DepartmentRecord departmentRecord = new DepartmentRecord(null, "IT");
-        departmentService.save(departmentRecord);
+        dslContext.attach(departmentRecord);
+        departmentRecord.store();
     }
 }

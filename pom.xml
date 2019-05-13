@@ -23,7 +23,7 @@
         <dependency>
             <groupId>io.seventytwo.oss</groupId>
             <artifactId>vaadin-jooq</artifactId>
-            <version>0.2.0</version>
+            <version>0.3.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -133,6 +133,13 @@
                         <version>3.11.9</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>com.amashchenko.maven.plugin</groupId>
+                <artifactId>gitflow-maven-plugin</artifactId>
+                <version>1.11.0</version>
+                <configuration>
+                </configuration>
             </plugin>
         </plugins>
     </build>
