@@ -15,14 +15,14 @@
 
     <properties>
         <java.version>12</java.version>
-        <vaadin.version>13.0.0</vaadin.version>
+        <vaadin.version>14.0.0</vaadin.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.seventytwo.oss</groupId>
             <artifactId>vaadin-jooq</artifactId>
-            <version>0.3.1</version>
+            <version>0.4.1</version>
         </dependency>
 
         <dependency>
