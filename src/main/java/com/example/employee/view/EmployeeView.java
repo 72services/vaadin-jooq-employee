@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static com.example.employee.model.tables.Employee.EMPLOYEE;
 import static com.example.employee.model.tables.VEmployee.V_EMPLOYEE;
+import static com.vaadin.flow.data.provider.SortDirection.ASCENDING;
 
 @Route
 public class EmployeeView extends VerticalLayout {
@@ -55,7 +56,7 @@ public class EmployeeView extends VerticalLayout {
 
         grid = new RecordGrid.Builder<>(V_EMPLOYEE, dslContext)
                 .withColumns(V_EMPLOYEE.EMPLOYEE_ID, V_EMPLOYEE.EMPLOYEE_NAME, V_EMPLOYEE.DEPARTMENT_NAME)
-                .withSort(Map.of(V_EMPLOYEE.EMPLOYEE_NAME, true))
+                .withSort(Map.of(V_EMPLOYEE.EMPLOYEE_NAME, ASCENDING))
                 .build();
 
         grid.setSizeFull();
