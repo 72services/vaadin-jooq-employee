@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import io.seventytwo.vaadinjooq.ui.RecordGrid;
 import org.jooq.DSLContext;
@@ -18,6 +19,7 @@ import static com.example.employee.model.tables.Employee.EMPLOYEE;
 import static com.example.employee.model.tables.VEmployee.V_EMPLOYEE;
 import static com.vaadin.flow.data.provider.SortDirection.ASCENDING;
 
+@PageTitle("Employees")
 @Route
 public class EmployeeView extends VerticalLayout {
 
