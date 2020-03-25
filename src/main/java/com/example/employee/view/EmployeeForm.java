@@ -11,6 +11,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.Result;
+import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
@@ -34,6 +35,8 @@ public class EmployeeForm extends FormLayout {
 
     private TextField id = new TextField("Id");
     private TextField name = new TextField("Name");
+    private TextField age = new TextField("Age");
+
     private ComboBox<DepartmentRecord> departmentId = new ComboBox<>("Department");
 
     private Binder<EmployeeRecord> binder = new Binder<>(EmployeeRecord.class);
@@ -69,14 +72,21 @@ public class EmployeeForm extends FormLayout {
 
         HorizontalLayout buttons = new HorizontalLayout(save, delete);
 
-        add(id, name, departmentId, buttons);
+        add(id, name, age, departmentId, buttons);
 
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         binder.forField(id)
                 .withNullRepresentation("")
-                .withConverter(new StringToIntegerConverter(0, "integers only"))
-                .bind(EmployeeRecord::getId, EmployeeRecord::setId);
+                .withConverter(new StringToIntegerConverter(0, "Integers only"))
+                .withValidator((value, context) -> value != null && value > 0 ? ValidationResult.ok() : ValidationResult.error("Value must be greater than 0"))
+                .bind(EmployeeRecord::getId, null);
+
+        binder.forField(age)
+                .withNullRepresentation("")
+                .withConverter(new StringToIntegerConverter(0, "Integers only"))
+                .withValidator((value, context) -> value != null && value > 0 ? ValidationResult.ok() : ValidationResult.error("Value must be greater than 0"))
+                .bind(EmployeeRecord::getAge, EmployeeRecord::setAge);
 
         binder.forField(departmentId)
                 .withConverter(new Converter<DepartmentRecord, Integer>() {
