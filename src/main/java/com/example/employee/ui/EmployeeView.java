@@ -1,4 +1,4 @@
-package com.example.employee.view;
+package com.example.employee.ui;
 
 import com.example.employee.model.tables.records.EmployeeRecord;
 import com.example.employee.model.tables.records.VEmployeeRecord;
@@ -64,12 +64,14 @@ public class EmployeeView extends VerticalLayout {
         grid.setSizeFull();
 
         grid.asSingleSelect().addValueChangeListener(event -> {
-            EmployeeRecord employee = dslContext
-                    .selectFrom(EMPLOYEE)
-                    .where(EMPLOYEE.ID.eq(event.getValue().getEmployeeId()))
-                    .fetchOne();
-            employeeForm.setEmployee(employee);
-            employeeForm.setVisible(true);
+            if (event.getValue() != null) {
+                EmployeeRecord employee = dslContext
+                        .selectFrom(EMPLOYEE)
+                        .where(EMPLOYEE.ID.eq(event.getValue().getEmployeeId()))
+                        .fetchOne();
+                employeeForm.setEmployee(employee);
+                employeeForm.setVisible(true);
+            }
         });
 
         employeeForm.setChangeHandler(() -> {

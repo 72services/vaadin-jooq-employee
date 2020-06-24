@@ -1,4 +1,4 @@
-package com.example.employee.view;
+package com.example.employee.ui;
 
 import com.example.employee.model.tables.records.DepartmentRecord;
 import com.example.employee.model.tables.records.EmployeeRecord;
@@ -150,7 +150,6 @@ public class EmployeeForm extends FormLayout {
             return null;
         });
     }
-
 
     public interface ChangeHandler {
         void onChange();
