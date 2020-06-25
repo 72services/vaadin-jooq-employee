@@ -22,7 +22,7 @@
         <dependency>
             <groupId>io.seventytwo.oss</groupId>
             <artifactId>vaadin-jooq</artifactId>
-            <version>0.4.2</version>
+            <version>0.5.1</version>
         </dependency>
 
         <dependency>
