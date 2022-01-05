@@ -26,3 +26,15 @@ node_modules
 /nbdist/
 /.nb-gradle/
 /build/
+
+### Vaadin ###
+/frontend/generated/
+/frontend/index.html
+/.npmrc
+/package.json
+/pnpm-lock.yaml
+/pnpmfile.js
+/tsconfig.json
+/types.d.ts
+/webpack.config.js
+/webpack.generated.js
