@@ -33,15 +33,13 @@ public class EmployeeForm extends FormLayout {
 
     private final List<DepartmentRecord> departments;
 
-    private TextField id = new TextField("Id");
-    private TextField name = new TextField("Name");
-    private TextField age = new TextField("Age");
+    private final TextField name = new TextField("Name");
 
-    private ComboBox<DepartmentRecord> departmentId = new ComboBox<>("Department");
+    private final ComboBox<DepartmentRecord> departmentId = new ComboBox<>("Department");
 
-    private Binder<EmployeeRecord> binder = new Binder<>(EmployeeRecord.class);
-    private Button save = new Button("Save");
-    private Button delete = new Button("Delete");
+    private final Binder<EmployeeRecord> binder = new Binder<>(EmployeeRecord.class);
+    private final Button save = new Button("Save");
+    private final Button delete = new Button("Delete");
 
     private EmployeeRecord employee;
 
@@ -50,16 +48,14 @@ public class EmployeeForm extends FormLayout {
     public EmployeeForm(DSLContext dslContext, TransactionTemplate transactionTemplate) {
         this.dslContext = dslContext;
 
+        setResponsiveSteps(new ResponsiveStep("0", 1));
+
         departments = dslContext.selectFrom(DEPARTMENT).orderBy(DEPARTMENT.NAME).fetch();
         this.transactionTemplate = transactionTemplate;
 
-        createUI();
-    }
-
-    private void createUI() {
         name.setRequired(true);
 
-        departmentId.setLabel("Departments");
+        departmentId.setLabel("Department");
         departmentId.setItemLabelGenerator(DepartmentRecord::getName);
         departmentId.setRequired(true);
 
@@ -70,8 +66,10 @@ public class EmployeeForm extends FormLayout {
             }
         });
 
-        HorizontalLayout buttons = new HorizontalLayout(save, delete);
+        var buttons = new HorizontalLayout(save, delete);
 
+        var id = new TextField("Id");
+        var age = new TextField("Age");
         add(id, name, age, departmentId, buttons);
 
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -93,7 +91,7 @@ public class EmployeeForm extends FormLayout {
                     @Override
                     public Result<Integer> convertToModel(DepartmentRecord departmentRecord, ValueContext valueContext) {
                         if (departmentRecord == null) {
-                            return Result.ok(0);
+                            return Result.ok(null);
                         } else {
                             return Result.ok(departmentRecord.getId());
                         }
@@ -101,11 +99,10 @@ public class EmployeeForm extends FormLayout {
 
                     @Override
                     public DepartmentRecord convertToPresentation(Integer integer, ValueContext valueContext) {
-                        if (integer == null) {
-                            return new DepartmentRecord(null, "");
-                        } else {
-                            return departments.stream().filter(departmentRecord -> departmentRecord.getId().equals(integer)).findFirst().get();
-                        }
+                        return departments.stream()
+                                .filter(departmentRecord -> departmentRecord.getId().equals(integer))
+                                .findFirst()
+                                .orElse(new DepartmentRecord(null, ""));
                     }
                 })
                 .bind(EmployeeRecord::getDepartmentId, EmployeeRecord::setDepartmentId);

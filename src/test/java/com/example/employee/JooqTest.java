@@ -5,19 +5,16 @@ import com.example.employee.model.tables.records.EmployeeRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static com.example.employee.model.tables.Department.DEPARTMENT;
 import static com.example.employee.model.tables.Employee.EMPLOYEE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-@RunWith(SpringRunner.class)
 public class JooqTest {
 
     @Autowired
@@ -29,7 +26,7 @@ public class JooqTest {
                 .selectFrom(EMPLOYEE)
                 .fetch();
 
-        Assert.assertEquals(1, records.size());
+        assertEquals(1, records.size());
     }
 
     @Test
@@ -41,10 +38,10 @@ public class JooqTest {
                 .where(DEPARTMENT.NAME.eq("IT"))
                 .fetch();
 
-        Assert.assertEquals(1, records.size());
+        assertEquals(1, records.size());
     }
 
-    @Before
+    @BeforeEach
     public void insertData() {
         DepartmentRecord department = dslContext
                 .selectFrom(DEPARTMENT)

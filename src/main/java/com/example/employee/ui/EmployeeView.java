@@ -10,6 +10,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import io.seventytwo.vaadinjooq.ui.RecordGrid;
 import org.jooq.DSLContext;
 
@@ -18,43 +19,32 @@ import java.util.Map;
 import static com.example.employee.model.tables.Employee.EMPLOYEE;
 import static com.example.employee.model.tables.VEmployee.V_EMPLOYEE;
 import static com.vaadin.flow.data.provider.SortDirection.ASCENDING;
+import static org.jooq.impl.DSL.lower;
 
 @PageTitle("Employees")
 @Route
+@RouteAlias("")
 public class EmployeeView extends VerticalLayout {
 
-    private final EmployeeForm employeeForm;
-    private final DSLContext dslContext;
-
     private RecordGrid<VEmployeeRecord> grid;
-    private TextField filterText = new TextField();
+    private final TextField filter = new TextField();
 
     public EmployeeView(EmployeeForm employeeForm, DSLContext dslContext) {
-        this.employeeForm = employeeForm;
-        this.dslContext = dslContext;
+        filter.setPlaceholder("Filter by name...");
+        filter.setValueChangeMode(ValueChangeMode.EAGER);
+        filter.addValueChangeListener(e -> grid.filter(lower(V_EMPLOYEE.EMPLOYEE_NAME).like("%" + e.getValue().toLowerCase() + "%")));
 
-        createUI();
-    }
+        var clear = new Button(VaadinIcon.CLOSE_CIRCLE.create());
+        clear.addClickListener(e -> filter.clear());
 
-    private void createUI() {
-        filterText.setPlaceholder("Filter by name...");
-        filterText.setValueChangeMode(ValueChangeMode.EAGER);
-        filterText.addValueChangeListener(e ->
-                grid.filter(V_EMPLOYEE.EMPLOYEE_NAME.lower().like("%" + e.getValue().toLowerCase() + "%")));
-
-        Button clearFilterTextBtn = new Button(VaadinIcon.CLOSE_CIRCLE.create());
-        clearFilterTextBtn.addClickListener(e -> filterText.clear());
-
-        HorizontalLayout filtering = new HorizontalLayout(filterText, clearFilterTextBtn);
-
-        Button addEmployeeButton = new Button("Add new employee");
-        addEmployeeButton.addClickListener(e -> {
+        var add = new Button("Add new employee");
+        add.addClickListener(e -> {
             grid.asSingleSelect().clear();
             employeeForm.setEmployee(new EmployeeRecord());
             employeeForm.setVisible(true);
         });
 
-        HorizontalLayout toolbar = new HorizontalLayout(filtering, addEmployeeButton);
+        var toolbar = new HorizontalLayout(filter, clear, add);
 
         grid = new RecordGrid.Builder<>(V_EMPLOYEE, dslContext)
                 .withColumns(V_EMPLOYEE.EMPLOYEE_ID, V_EMPLOYEE.EMPLOYEE_NAME, V_EMPLOYEE.DEPARTMENT_NAME)
@@ -79,7 +69,7 @@ public class EmployeeView extends VerticalLayout {
             grid.refresh();
         });
 
-        HorizontalLayout main = new HorizontalLayout(grid, employeeForm);
+        var main = new HorizontalLayout(grid, employeeForm);
         main.setSizeFull();
 
         add(toolbar, main);
