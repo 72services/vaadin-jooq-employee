@@ -26,7 +26,7 @@ public class JooqTest {
                 .selectFrom(EMPLOYEE)
                 .fetch();
 
-        assertEquals(1, records.size());
+        assertEquals(3, records.size());
     }
 
     @Test
@@ -38,7 +38,7 @@ public class JooqTest {
                 .where(DEPARTMENT.NAME.eq("IT"))
                 .fetch();
 
-        assertEquals(1, records.size());
+        assertEquals(3, records.size());
     }
 
     @BeforeEach
