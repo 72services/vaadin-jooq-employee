@@ -1,4 +1,4 @@
-package com.example.employee;
+package io.seventytwo.demo.vaadinjooq.employee;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

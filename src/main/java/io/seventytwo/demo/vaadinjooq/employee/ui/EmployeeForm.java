@@ -1,7 +1,7 @@
-package com.example.employee.ui;
+package io.seventytwo.demo.vaadinjooq.employee.ui;
 
-import com.example.employee.model.tables.records.DepartmentRecord;
-import com.example.employee.model.tables.records.EmployeeRecord;
+import io.seventytwo.demo.vaadinjooq.employee.model.tables.records.DepartmentRecord;
+import io.seventytwo.demo.vaadinjooq.employee.model.tables.records.EmployeeRecord;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -11,7 +11,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.Result;
-import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
@@ -22,7 +21,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
-import static com.example.employee.model.tables.Department.DEPARTMENT;
+import static io.seventytwo.demo.vaadinjooq.employee.model.tables.Department.DEPARTMENT;
+import static io.seventytwo.demo.vaadinjooq.employee.ui.EmployeeForm.ChangeHandler.Operation.DELETE;
+import static io.seventytwo.demo.vaadinjooq.employee.ui.EmployeeForm.ChangeHandler.Operation.INSERT;
+import static io.seventytwo.demo.vaadinjooq.employee.ui.EmployeeForm.ChangeHandler.Operation.UPDATE;
 
 @UIScope
 @SpringComponent
@@ -33,13 +35,13 @@ public class EmployeeForm extends FormLayout {
 
     private final List<DepartmentRecord> departments;
 
-    private final TextField name = new TextField("Name");
+    private final TextField firstName;
 
     private final ComboBox<DepartmentRecord> departmentId = new ComboBox<>("Department");
 
     private final Binder<EmployeeRecord> binder = new Binder<>(EmployeeRecord.class);
-    private final Button save = new Button("Save");
-    private final Button delete = new Button("Delete");
+    private final Button save;
+    private final Button delete;
 
     private EmployeeRecord employee;
 
@@ -53,8 +55,6 @@ public class EmployeeForm extends FormLayout {
         departments = dslContext.selectFrom(DEPARTMENT).orderBy(DEPARTMENT.NAME).fetch();
         this.transactionTemplate = transactionTemplate;
 
-        name.setRequired(true);
-
         departmentId.setLabel("Department");
         departmentId.setItemLabelGenerator(DepartmentRecord::getName);
         departmentId.setRequired(true);
@@ -66,25 +66,24 @@ public class EmployeeForm extends FormLayout {
             }
         });
 
-        var buttons = new HorizontalLayout(save, delete);
-
         var id = new TextField("Id");
-        var age = new TextField("Age");
-        add(id, name, age, departmentId, buttons);
-
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        firstName = new TextField("First Name");
+        var lastName = new TextField("Last Name");
 
         binder.forField(id)
                 .withNullRepresentation("")
                 .withConverter(new StringToIntegerConverter(0, "Integers only"))
-                .withValidator((value, context) -> value != null && value > 0 ? ValidationResult.ok() : ValidationResult.error("Value must be greater than 0"))
                 .bind(EmployeeRecord::getId, null);
 
-        binder.forField(age)
-                .withNullRepresentation("")
-                .withConverter(new StringToIntegerConverter(0, "Integers only"))
-                .withValidator((value, context) -> value != null && value > 0 ? ValidationResult.ok() : ValidationResult.error("Value must be greater than 0"))
-                .bind(EmployeeRecord::getAge, EmployeeRecord::setAge);
+        binder.forField(firstName)
+                .asRequired()
+                .withValidator(s -> s != null && s.length() > 1, "Must be at least 1 character")
+                .bind(EmployeeRecord::getFirstName, EmployeeRecord::setFirstName);
+
+        binder.forField(lastName)
+                .asRequired()
+                .withValidator(s -> s != null && s.length() > 1, "Must be at least 1 character")
+                .bind(EmployeeRecord::getLastName, EmployeeRecord::setLastName);
 
         binder.forField(departmentId)
                 .withConverter(new Converter<DepartmentRecord, Integer>() {
@@ -107,9 +106,14 @@ public class EmployeeForm extends FormLayout {
                 })
                 .bind(EmployeeRecord::getDepartmentId, EmployeeRecord::setDepartmentId);
 
-        binder.bindInstanceFields(this);
+        save = new Button("Save");
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        save.addClickListener(this::save);
 
-        setVisible(false);
+        delete = new Button("Delete");
+        delete.addClickListener(this::delete);
+
+        add(id, firstName, lastName, departmentId, new HorizontalLayout(save, delete));
     }
 
     public void setEmployee(EmployeeRecord employee) {
@@ -118,10 +122,7 @@ public class EmployeeForm extends FormLayout {
         this.employee = employee;
         binder.setBean(employee);
 
-        name.focus();
-
-        save.addClickListener(this::save);
-        delete.addClickListener(this::delete);
+        firstName.focus();
     }
 
     public void setChangeHandler(ChangeHandler changeHandler) {
@@ -129,26 +130,30 @@ public class EmployeeForm extends FormLayout {
     }
 
     private void save(ClickEvent<Button> event) {
-        transactionTemplate.execute(transactionStatus -> {
+        transactionTemplate.executeWithoutResult(ts -> {
+            Integer id = employee.getId();
+
             dslContext.attach(employee);
             employee.store();
 
-            changeHandler.onChange();
-            return null;
+            changeHandler.onChange(id == null ? INSERT : UPDATE);
         });
     }
 
     private void delete(ClickEvent<Button> event) {
-        transactionTemplate.execute(transactionStatus -> {
+        transactionTemplate.executeWithoutResult(ts -> {
             dslContext.attach(employee);
             employee.delete();
 
-            changeHandler.onChange();
-            return null;
+            changeHandler.onChange(DELETE);
         });
     }
 
     public interface ChangeHandler {
-        void onChange();
+        void onChange(Operation operation);
+
+        enum Operation {
+            INSERT, UPDATE, DELETE
+        }
     }
 }
