@@ -1,9 +1,9 @@
 package io.seventytwo.demo.vaadinjooq.employee.data;
 
-import io.seventytwo.demo.vaadinjooq.employee.model.tables.records.DepartmentRecord;
-import io.seventytwo.demo.vaadinjooq.employee.model.tables.records.EmployeeRecord;
 import com.vaadin.exampledata.DataType;
 import com.vaadin.exampledata.ExampleDataGenerator;
+import io.seventytwo.demo.vaadinjooq.employee.model.tables.records.DepartmentRecord;
+import io.seventytwo.demo.vaadinjooq.employee.model.tables.records.EmployeeRecord;
 import org.jooq.DSLContext;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
